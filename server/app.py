@@ -14,13 +14,25 @@ migrate = Migrate(app, db)
 
 db.init_app(app)
 
+@app.route('/')
+def home():
+    return jsonify({"message": "Welcome to the Chatterbox API!"})
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/messages')
 def messages():
-    return ''
+    messages = Message.query.all()
+    return jsonify([message.to_dict() for message in messages])
 
 @app.route('/messages/<int:id>')
 def messages_by_id(id):
-    return ''
+    message = Message.query.get(id)
+    if not message:
+        return make_response({"error": "Message not found"}, 404)
+    return jsonify(message.to_dict())
 
 if __name__ == '__main__':
     app.run(port=5555)
